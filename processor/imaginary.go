@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/agravelot/imageopti/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 const httpTimeout = 5 * time.Second
