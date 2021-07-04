@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/agravelot/imageopti/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 const defaultTimeout = 1 * time.Second
