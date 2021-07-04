@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agravelot/imageopti/cache"
-	"github.com/agravelot/imageopti/config"
-	"github.com/agravelot/imageopti/processor"
+	"github.com/Allaux/traefik-image-optimize/cache"
+	"github.com/Allaux/traefik-image-optimize/config"
+	"github.com/Allaux/traefik-image-optimize/processor"
 )
 
 // Config the plugin configuration.
