@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 func TestImageOptimizer_ServeHTTP(t *testing.T) {

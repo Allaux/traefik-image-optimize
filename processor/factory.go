@@ -3,7 +3,7 @@ package processor
 import (
 	"fmt"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 type Processor interface {

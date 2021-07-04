@@ -18,13 +18,13 @@ services:
       - "--entryPoints.metrics.address=:8082"
       - "--metrics.prometheus.entryPoint=metrics"
       - "--experimental.devPlugin.goPath=/plugins"
-      - "--experimental.devPlugin.moduleName=github.com/agravelot/image_optimizer"
+      - "--experimental.devPlugin.moduleName=github.com/Allaux/traefik-image-optimize"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
-      - "/home/agravelot/Lab/traefik-image-optimization:/plugins/src/github.com/agravelot/image_optimizer:rw,delegated"
+      - "/home/agravelot/Lab/traefik-image-optimization:/plugins/src/github.com/Allaux/traefik-image-optimize:rw,delegated"
       # - "./gateway/traefik.yml:/etc/traefik/traefik.yml:ro,delegated"
       - "letsencrypt:/letsencrypt:rw,delegated"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -86,5 +86,5 @@ volumes:
 networks:
   metrics:
   traefik-net:
-    external: 
+    external:
       name: traefik-net

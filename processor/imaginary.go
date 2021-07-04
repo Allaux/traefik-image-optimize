@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 type pipelineOperationParams struct {

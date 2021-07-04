@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/agravelot/image_optimizer/config"
-	"github.com/agravelot/image_optimizer/processor"
+	"github.com/Allaux/traefik-image-optimize/config"
+	"github.com/Allaux/traefik-image-optimize/processor"
 )
 
 func TestNew(t *testing.T) {

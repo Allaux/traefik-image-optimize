@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 type Cache interface {

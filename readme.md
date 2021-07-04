@@ -10,8 +10,8 @@ Easy to extend, you can implement your own image processing logic and caching sy
 To be active for a given Traefik instance, it must be declared in the static configuration.
 
 You can request your images as usual, and just add `w=<width>` in query param.
-```bash 
-curl "http://demo.localhost/very_big.jpg" # return converted to webp and without metadata 
+```bash
+curl "http://demo.localhost/very_big.jpg" # return converted to webp and without metadata
 curl "http://demo.localhost/very_big.jpg?w=1725" # return resized with 1725px width, converted to webp and without metadata
 ```
 
@@ -28,8 +28,8 @@ pilot:
 
 experimental:
   plugins:
-    image_optimizer:
-      moduleName: github.com/agravelot/image_optimizer
+    imageopti:
+      moduleName: github.com/Allaux/traefik-image-optimize
       version: v0.1.0
 ```
 
@@ -53,7 +53,7 @@ http:
       loadBalancer:
         servers:
           - url: http://127.0.0.1:5000
-  
+
   middlewares:
     image_optimizer:
       plugin:
@@ -109,4 +109,3 @@ You can now implement our own image processing or caching systems by implementin
 After that, make sure to add your new configuration and add it to the corresponding factory.
 
 Note that only one plugin can be tested in dev mode at a time, and when using dev mode, Traefik will shut down after 30 minutes.
-

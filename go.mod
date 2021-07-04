@@ -1,3 +1,3 @@
-module github.com/agravelot/image_optimizer
+module github.com/Allaux/traefik-image-optimize
 
 go 1.16
