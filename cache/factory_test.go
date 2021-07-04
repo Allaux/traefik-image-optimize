@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/agravelot/imageopti/cache"
-	"github.com/agravelot/imageopti/config"
+	"github.com/Allaux/traefik-image-optimize/cache"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 func TestNew(t *testing.T) {
