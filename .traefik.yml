@@ -7,6 +7,6 @@ summary: 'Image optimizer middleware is a middleware designed to optimize image 
 
 testData:
   config:
-    processor: none
+    processor: none 
     cache: none
 
