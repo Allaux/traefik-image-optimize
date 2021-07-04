@@ -1,20 +1,20 @@
-package imageopti
+package image_optimizer
 
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/agravelot/imageopti/config"
+	"github.com/agravelot/image_optimizer/config"
 )
 
 func TestImageOptimizer_ServeHTTP(t *testing.T) {
 	type args struct {
 		config config.Config
 	}
-
 	tests := []struct {
 		name                      string
 		args                      args
@@ -27,16 +27,8 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 		wantErr                   bool
 	}{
 		{
-			name: "should pass with processor",
-			args: args{
-				config: config.Config{
-					Processor: "imaginary",
-					Imaginary: config.ImaginaryProcessorConfig{URL: "http://localhost"},
-					Cache:     "none",
-					Redis:     config.RedisCacheConfig{URL: ""},
-					File:      config.FileCacheConfig{Path: ""},
-				},
-			},
+			name:                      "should pass with processor",
+			args:                      args{config: config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
 			want:                      false,
 			wantErr:                   false,
 			wantedCacheStatus:         "",
@@ -46,16 +38,8 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			remoteResponseContent:     []byte("dummy response"),
 		},
 		{
-			name: "should not pass without processor and cache and return no cache status header",
-			args: args{
-				config: config.Config{
-					Processor: "",
-					Cache:     "",
-					Redis:     config.RedisCacheConfig{URL: ""},
-					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
-				},
-			},
+			name:                      "should not pass without processor and cache and return no cache status header",
+			args:                      args{config: config.Config{Processor: ""}},
 			want:                      false,
 			wantedCacheStatus:         "",
 			wantedSecondCacheStatus:   "",
@@ -65,28 +49,20 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			remoteResponseContent:     []byte("dummy response"),
 		},
 		// TODO Require to save response headers in cache
-		// {
+		//{
 		//	name:                      "should not modify image with none driver and cache file driver with cache status",
 		//	args:                      args{config: config.Config{Processor: "none", Cache: "memory"}},
 		//	want:                      false,
 		//	wantErr:                   false,
 		//	wantedCacheStatus:         "miss",
-		// 	wantedSecondCacheStatus:   "hit",
-		// 	wantedContentType:         "image/jpeg",
-		// 	remoteResponseContentType: "image/jpeg",
-		// 	remoteResponseContent:     []byte("dummy image"),
-		// },
+		//	wantedSecondCacheStatus:   "hit",
+		//	wantedContentType:         "image/jpeg",
+		//	remoteResponseContentType: "image/jpeg",
+		//	remoteResponseContent:     []byte("dummy image"),
+		//},
 		{
-			name: "should not modify image with none driver and cache file driver with cache status",
-			args: args{
-				config: config.Config{
-					Processor: "local",
-					Cache:     "memory",
-					Redis:     config.RedisCacheConfig{URL: ""},
-					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
-				},
-			},
+			name:                      "should not modify image with none driver and cache file driver with cache status",
+			args:                      args{config: config.Config{Processor: "local", Cache: "memory"}},
 			want:                      false,
 			wantErr:                   false,
 			wantedCacheStatus:         "miss",
@@ -96,16 +72,8 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			remoteResponseContent:     []byte("dummy image"),
 		},
 		{
-			name: "should return original response if not image request and return no cache status header",
-			args: args{
-				config: config.Config{
-					Processor: "none",
-					Cache:     "",
-					Redis:     config.RedisCacheConfig{URL: ""},
-					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
-				},
-			},
+			name:                      "should return original response if not image request and return no cache status header",
+			args:                      args{config: config.Config{Processor: "none"}},
 			want:                      false,
 			wantErr:                   false,
 			wantedCacheStatus:         "",
@@ -115,7 +83,6 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			remoteResponseContent:     []byte("dummy response"),
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := CreateConfig()
@@ -160,6 +127,9 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			}
 
 			if recorder.Header().Get("cache-status") != tt.wantedCacheStatus {
+				fmt.Printf("a:%#v\n", tt.wantedCacheStatus)
+				fmt.Printf("b:%#v\n", recorder.Header().Get("cache-status"))
+
 				t.Fatalf("response cache-status expected: %v got: %v", tt.wantedCacheStatus, recorder.Header().Get("cache-status"))
 			}
 
@@ -176,11 +146,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			}
 
 			if recorder.Header().Get("cache-status") != tt.wantedSecondCacheStatus {
-				t.Fatalf(
-					"response cache-status expected: %v got: %v",
-					tt.wantedSecondCacheStatus,
-					recorder.Header().Get("cache-status"),
-				)
+				t.Fatalf("response cache-status expected: %v got: %v", tt.wantedSecondCacheStatus, recorder.Header().Get("cache-status"))
 			}
 		})
 	}
@@ -190,7 +156,6 @@ func TestIsImageResponse(t *testing.T) {
 	type args struct {
 		contentType string
 	}
-
 	tests := []struct {
 		name    string
 		args    args
@@ -222,7 +187,6 @@ func TestIsImageResponse(t *testing.T) {
 			wantErr: false,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
@@ -238,7 +202,10 @@ func TestIsImageResponse(t *testing.T) {
 }
 
 func TestImageWidthRequest(t *testing.T) {
-	type args struct{ url string }
+	type args struct {
+		url string
+	}
+	ctx := context.Background()
 
 	tests := []struct {
 		name    string
@@ -247,7 +214,7 @@ func TestImageWidthRequest(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "should return error with positive width",
+			name:    "should return error with positve width",
 			args:    args{url: "http://localhost?w=124"},
 			want:    124,
 			wantErr: false,
@@ -277,11 +244,9 @@ func TestImageWidthRequest(t *testing.T) {
 			wantErr: false,
 		},
 	}
-
 	for _, tt := range tests {
-		ctx := context.Background()
-
 		t.Run(tt.name, func(t *testing.T) {
+
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, tt.args.url, nil)
 			if err != nil {
 				t.Fatal(err)

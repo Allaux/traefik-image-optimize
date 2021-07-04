@@ -1,4 +1,3 @@
-// Package processor Add support for imaginary imge processing service.
 package processor
 
 import (
@@ -9,12 +8,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"time"
 
-	"github.com/agravelot/imageopti/config"
+	"github.com/agravelot/image_optimizer/config"
 )
-
-const httpTimeout = 5 * time.Second
 
 type pipelineOperationParams struct {
 	Font      string  `json:"font,omitempty"`
@@ -33,20 +29,20 @@ type pipelineOperation struct {
 	Params    pipelineOperationParams `json:"params"`
 }
 
-// ImaginaryProcessor define imaginary processor settings.
 type ImaginaryProcessor struct {
-	URL    string
+	Url    string
 	client http.Client
 }
 
-func isValidURL(s string) error {
+func isValidUrl(s string) error {
+
 	if s == "" {
 		return fmt.Errorf("url cannot be empty")
 	}
 
 	u, err := url.ParseRequestURI(s)
 	if err != nil {
-		return fmt.Errorf("unable to parse imaginary url: %w", err)
+		return err
 	}
 
 	if u.Scheme != "http" && u.Scheme != "https" {
@@ -56,23 +52,21 @@ func isValidURL(s string) error {
 	return nil
 }
 
-// NewImaginary instantiate a new imaginary instance with given config.
 func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
-	err := isValidURL(conf.Imaginary.URL)
+
+	err := isValidUrl(conf.Imaginary.Url)
 	if err != nil {
 		return nil, err
 	}
 
 	return &ImaginaryProcessor{
-		client: http.Client{
-			Timeout: httpTimeout,
-		},
-		URL: conf.Imaginary.URL,
+		client: http.Client{},
+		Url:    conf.Imaginary.Url,
 	}, nil
 }
 
-// Optimize method to process image with imaginary with given parameters.
-func (ip *ImaginaryProcessor) Optimize(media []byte, of string, tf string, q, width int) ([]byte, string, error) {
+func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error) {
+
 	ope := []pipelineOperation{
 		{Operation: "convert", Params: pipelineOperationParams{Type: "webp", StripMeta: true}},
 	}
@@ -83,48 +77,48 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, of string, tf string, q, wi
 
 	opString, err := json.Marshal(ope)
 	if err != nil {
-		return nil, "", fmt.Errorf("unable generate imaginary operations: %w", err)
+		return nil, "", err
 	}
 
-	u := fmt.Sprintf("%s/pipeline?operations=%s", ip.URL, url.QueryEscape(string(opString)))
+	u := fmt.Sprintf("%s/pipeline?operations=%s", ip.Url, url.QueryEscape(string(opString)))
 	method := "POST"
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 	fileWriter, err := writer.CreateFormFile("file", "tmp.jpg")
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to create file to imaginary file writer: %w", err)
+		return nil, "", err
 	}
 
 	_, err = fileWriter.Write(media)
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to write file to imaginary file writer: %w", err)
+		return nil, "", err
 	}
 
 	err = writer.Close()
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to close imaginary file writer: %w", err)
+		return nil, "", err
 	}
 
 	req, err := http.NewRequest(method, u, payload)
-	if err != nil {
-		return nil, "", fmt.Errorf("unable to create imaginary request: %w", err)
-	}
 
+	if err != nil {
+		return nil, "", err
+	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := ip.client.Do(req)
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to send imaginary request: %w", err)
+		return nil, "", err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to read imaginary response body: %w", err)
+		return nil, "", err
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return nil, "", fmt.Errorf("unable to close imaginary body response: %w", err)
+		return nil, "", err
 	}
 
 	return body, "image/webp", nil

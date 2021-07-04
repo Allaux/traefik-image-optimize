@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-// Tokenize generate unique key for request caching strategy.
 func Tokenize(req *http.Request) (string, error) {
 	width := req.URL.Query().Get("w")
 

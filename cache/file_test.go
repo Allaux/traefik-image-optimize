@@ -159,15 +159,15 @@ func BenchmarkFileCache_Get(b *testing.B) {
 	}
 }
 
-func createTempDir(tb testing.TB) string {
+func createTempDir(t testing.TB) string {
 	dir, err := ioutil.TempDir("./", "example")
 	if err != nil {
-		tb.Fatal(err)
+		t.Fatal(err)
 	}
 
-	tb.Cleanup(func() {
+	t.Cleanup(func() {
 		if err = os.RemoveAll(dir); err != nil {
-			tb.Fatal(err)
+			t.Fatal(err)
 		}
 	})
 

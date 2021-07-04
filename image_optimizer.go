@@ -1,8 +1,6 @@
-// Package imageopti Image optimizer plugin
-package imageopti
+package image_optimizer
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -12,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agravelot/imageopti/cache"
-	"github.com/agravelot/imageopti/config"
-	"github.com/agravelot/imageopti/processor"
+	"github.com/agravelot/image_optimizer/cache"
+	"github.com/agravelot/image_optimizer/config"
+	"github.com/agravelot/image_optimizer/processor"
 )
 
 // Config the plugin configuration.
@@ -24,15 +22,7 @@ type Config struct {
 
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
-	return &Config{
-		config.Config{
-			Processor: "",
-			Cache:     "",
-			Imaginary: config.ImaginaryProcessorConfig{URL: ""},
-			Redis:     config.RedisCacheConfig{URL: ""},
-			File:      config.FileCacheConfig{Path: ""},
-		},
-	}
+	return &Config{}
 }
 
 // ImageOptimizer middleware plugin struct.
@@ -45,7 +35,9 @@ type ImageOptimizer struct {
 
 // New created a new ImageOptimizer plugin.
 func New(ctx context.Context, next http.Handler, conf *Config, name string) (http.Handler, error) {
+
 	log.Println("Loading image optimization plugin...")
+	fmt.Printf("config : %+v\n", conf)
 
 	if conf.Processor == "" {
 		return nil, fmt.Errorf("processor must be defined")
@@ -58,6 +50,7 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 
 	p, err := processor.New(conf.Config)
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 
@@ -70,40 +63,38 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 }
 
 const (
-	contentLength   = "Content-Length"
-	contentType     = "Content-Type"
-	cacheStatus     = "Cache-Status"
-	cacheHitStatus  = "hit"
-	cacheMissStatus = "miss"
-	cacheExpiry     = 100 * time.Second
-	targetFormat    = "image/webp"
+	contentLength    = "Content-Length"
+	contentType      = "Content-Type"
+	cacheStatus      = "Cache-Status"
+	cacheHitStatus   = "hit"
+	cacheMissStatus  = "miss"
+	cacheErrorStatus = "error"
 )
 
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// TODO Check if cacheable
+
+	targetFormat := "image/webp"
+	// Return cached result here.
 	key, err := cache.Tokenize(req)
 	if err != nil {
 		panic(err)
 	}
-	// Return cached result here.
-	if v, err := a.c.Get(key); err == nil {
-		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
-		rw.Header().Set(contentType, targetFormat)
-		rw.Header().Set(cacheStatus, cacheHitStatus)
-		_, err = rw.Write(v)
 
+	if v, err := a.c.Get(key); err == nil {
+		rw.Header().Set(cacheStatus, cacheHitStatus)
+		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
+		rw.Header().Add(contentType, targetFormat)
+		_, err = rw.Write(v)
 		if err != nil {
 			panic(err)
 		}
-
 		return
 	}
 
 	wrappedWriter := &responseWriter{
 		ResponseWriter: rw,
 		bypassHeader:   true,
-		wroteHeader:    false,
-		buffer:         bytes.Buffer{},
 	}
 
 	a.next.ServeHTTP(wrappedWriter, req)
@@ -117,7 +108,6 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-
 		return
 	}
 
@@ -140,7 +130,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	err = a.c.Set(key, optimized, cacheExpiry)
+	err = a.c.Set(key, optimized, 100*time.Second)
 	if err != nil {
 		panic(err)
 	}
@@ -156,7 +146,7 @@ func imageWidthRequest(req *http.Request) (int, error) {
 
 	v, err := strconv.Atoi(w)
 	if err != nil {
-		return 0, fmt.Errorf("unable to convert w query param to int: %w", err)
+		return 0, err
 	}
 
 	if v < 0 {

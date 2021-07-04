@@ -14,14 +14,12 @@ func TestTokenize(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		return req
 	}
 
 	type args struct {
 		req *http.Request
 	}
-
 	tests := []struct {
 		name    string
 		args    args

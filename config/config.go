@@ -1,17 +1,13 @@
-// Package config provide configurations structs for imageopti middleware.
 package config
 
-// ImaginaryProcessorConfig define imaginary image processor configurations.
 type ImaginaryProcessorConfig struct {
-	URL string `json:"url" yaml:"url" toml:"url"`
+	Url string `json:"url" yaml:"url" toml:"url"`
 }
 
-// RedisCacheConfig define redis cache system configurations.
 type RedisCacheConfig struct {
-	URL string `json:"url" yaml:"url" toml:"url"`
+	Url string `json:"url" yaml:"url" toml:"url"`
 }
 
-// FileCacheConfig define file cache system configurations.
 type FileCacheConfig struct {
 	Path string `json:"path" yaml:"path" toml:"path"`
 }

@@ -4,7 +4,7 @@ global:
 experimental:
   devPlugin:
     goPath: /plugins
-    moduleName: imageopti
+    moduleName: image_optimizer
 
 entryPoints:
   web:

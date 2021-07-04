@@ -1,9 +1,7 @@
-// Package imageopti Bypass default response writer to override headers and body
-package imageopti
+package image_optimizer
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 )
 
@@ -16,6 +14,7 @@ type responseWriter struct {
 }
 
 func (r *responseWriter) WriteHeader(statusCode int) {
+
 	if !r.bypassHeader {
 		r.ResponseWriter.WriteHeader(statusCode)
 	}
@@ -25,13 +24,7 @@ func (r *responseWriter) Write(p []byte) (int, error) {
 	if !r.wroteHeader {
 		r.WriteHeader(http.StatusOK)
 	}
-
-	i, err := r.buffer.Write(p)
-	if err != nil {
-		return i, fmt.Errorf("unable to write response body: %w", err)
-	}
-
-	return i, nil
+	return r.buffer.Write(p)
 }
 
 func (r *responseWriter) Flush() {
