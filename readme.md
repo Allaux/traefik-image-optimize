@@ -29,7 +29,7 @@ pilot:
 experimental:
   plugins:
     imageopti:
-      moduleName: github.com/agravelot/imageopti
+      moduleName: github.com/Allaux/traefik-image-optimize
       version: v0.1.0
 ```
 
