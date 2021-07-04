@@ -4,7 +4,7 @@ package processor
 import (
 	"fmt"
 
-	"github.com/agravelot/imageopti/config"
+	"github.com/Allaux/traefik-image-optimize/config"
 )
 
 // Processor Define processor interface.
